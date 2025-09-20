@@ -84,4 +84,18 @@ describe('MLBApiService', () => {
             await expect(service.getTodaysGames()).rejects.toThrow('Failed to fetch MLB data: HTTP error! status: 404');
         });
     });
+
+    describe('getTeamAbbreviation', () => {
+        it('should return correct abbreviations for known teams', () => {
+            expect(service.getTeamAbbreviation('New York Yankees')).toBe('NYY');
+            expect(service.getTeamAbbreviation('Boston Red Sox')).toBe('BOS');
+            expect(service.getTeamAbbreviation('Chicago Cubs')).toBe('CHC');
+            expect(service.getTeamAbbreviation('Athletics')).toBe('OAK');
+        });
+
+        it('should return first 3 characters for unknown teams', () => {
+            expect(service.getTeamAbbreviation('Unknown Team')).toBe('UNK');
+            expect(service.getTeamAbbreviation('Test')).toBe('TES');
+        });
+    });
 });

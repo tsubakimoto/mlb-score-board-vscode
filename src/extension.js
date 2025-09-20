@@ -4,11 +4,21 @@ import { MLBScoreBoardProvider } from './mlbScoreBoardProvider.js';
 export function activate(context) {
     const provider = new MLBScoreBoardProvider();
     
-    const disposable = vscode.commands.registerCommand('mlbScoreBoard.showScores', () => {
-        provider.showScores();
+    // Register the tree data provider
+    const treeView = vscode.window.createTreeView('mlbScoreBoard', {
+        treeDataProvider: provider,
+        showCollapseAll: false
+    });
+    
+    // Register the refresh command
+    const refreshCommand = vscode.commands.registerCommand('mlbScoreBoard.refresh', () => {
+        provider.refresh();
     });
 
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(treeView, refreshCommand);
+    
+    // Initial load of scores
+    provider.refresh();
 }
 
 export function deactivate() {}

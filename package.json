@@ -2,11 +2,11 @@
   "name": "mlb-score-board-vscode",
   "displayName": "MLB Score Board",
   "description": "View MLB game results for today",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "publisher": "tsubakimoto",
   "type": "module",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.77.0"
   },
   "categories": [
     "Other"
@@ -35,5 +35,14 @@
   },
   "license": "MIT",
   "author": "Yuta Matsumura",
-  "keywords": ["mlb", "baseball", "scores", "sports"]
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tsubakimoto/mlb-score-board-vscode.git"
+  },
+  "keywords": [
+    "mlb",
+    "baseball",
+    "scores",
+    "sports"
+  ]
 }

@@ -12,17 +12,35 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:mlbScoreBoard.showScores"
+    "onView:mlbScoreBoard"
   ],
   "main": "./src/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "mlbScoreBoard",
+          "name": "MLB Scores",
+          "when": "true"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "mlbScoreBoard.showScores",
-        "title": "Show MLB Scores",
-        "category": "MLB"
+        "command": "mlbScoreBoard.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "mlbScoreBoard.refresh",
+          "when": "view == mlbScoreBoard",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "vitest",

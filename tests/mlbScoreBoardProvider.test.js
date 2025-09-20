@@ -1,20 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MLBScoreBoardProvider } from '../src/mlbScoreBoardProvider.js';
 
+// Mock vscode module with TreeItem and EventEmitter
 vi.mock('vscode', () => ({
-    window: {
-        createWebviewPanel: vi.fn(() => ({
-            reveal: vi.fn(),
-            onDidDispose: vi.fn(),
-            webview: {
-                onDidReceiveMessage: vi.fn(),
-                html: ''
-            }
-        })),
-        showErrorMessage: vi.fn()
+    TreeItem: class TreeItem {
+        constructor(label, collapsibleState) {
+            this.label = label;
+            this.collapsibleState = collapsibleState;
+        }
     },
-    ViewColumn: {
-        One: 1
+    TreeItemCollapsibleState: {
+        None: 0,
+        Collapsed: 1,
+        Expanded: 2
+    },
+    EventEmitter: class EventEmitter {
+        constructor() {
+            this.event = vi.fn();
+        }
+        fire() {
+            // Mock fire method
+        }
+    },
+    window: {
+        showErrorMessage: vi.fn()
     }
 }));
 
@@ -25,28 +34,76 @@ describe('MLBScoreBoardProvider', () => {
     beforeEach(() => {
         provider = new MLBScoreBoardProvider();
         mockApiService = {
-            getTodaysGames: vi.fn()
+            getTodaysGames: vi.fn(),
+            getTeamAbbreviation: vi.fn((teamName) => {
+                const abbreviations = {
+                    'New York Yankees': 'NYY',
+                    'Boston Red Sox': 'BOS',
+                    'Chicago Cubs': 'CHC',
+                    'Athletics': 'OAK'
+                };
+                return abbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+            })
         };
         provider.apiService = mockApiService;
     });
 
-    describe('getTeamAbbreviation', () => {
-        it('should return correct abbreviations for known teams', () => {
-            expect(provider.getTeamAbbreviation('New York Yankees')).toBe('NYY');
-            expect(provider.getTeamAbbreviation('Boston Red Sox')).toBe('BOS');
-            expect(provider.getTeamAbbreviation('Chicago Cubs')).toBe('CHC');
-            expect(provider.getTeamAbbreviation('Athletics')).toBe('OAK');
-        });
-
-        it('should return first 3 characters for unknown teams', () => {
-            expect(provider.getTeamAbbreviation('Unknown Team')).toBe('UNK');
-            expect(provider.getTeamAbbreviation('Test')).toBe('TES');
+    describe('getTreeItem', () => {
+        it('should return the tree item as-is', () => {
+            const mockItem = { label: 'Test Item' };
+            const result = provider.getTreeItem(mockItem);
+            expect(result).toBe(mockItem);
         });
     });
 
-    describe('generateHtml', () => {
-        it('should generate HTML with game scores', () => {
-            const games = [
+    describe('getChildren', () => {
+        it('should return game items for root element', () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: 10 },
+                        home: { team: { name: 'Boston Red Sox' }, score: 5 }
+                    },
+                    status: { detailedState: 'Final' }
+                }
+            ];
+            provider.games = mockGames;
+
+            const children = provider.getChildren();
+
+            expect(children).toHaveLength(1);
+            expect(children[0].label).toBe('NYY 10 - 5 BOS');
+            expect(children[0].description).toBe('Final');
+        });
+
+        it('should return empty array for non-root elements', () => {
+            const children = provider.getChildren({ label: 'Some Game' });
+            expect(children).toEqual([]);
+        });
+
+        it('should handle games with no scores', () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: undefined },
+                        home: { team: { name: 'Boston Red Sox' }, score: undefined }
+                    },
+                    status: { detailedState: 'Scheduled' }
+                }
+            ];
+            provider.games = mockGames;
+
+            const children = provider.getChildren();
+
+            expect(children).toHaveLength(1);
+            expect(children[0].label).toBe('NYY 0 - 0 BOS');
+            expect(children[0].description).toBe('Scheduled');
+        });
+    });
+
+    describe('refresh', () => {
+        it('should load games and fire tree data change event', async () => {
+            const mockGames = [
                 {
                     teams: {
                         away: { team: { name: 'New York Yankees' }, score: 10 },
@@ -56,45 +113,25 @@ describe('MLBScoreBoardProvider', () => {
                 }
             ];
 
-            const html = provider.generateHtml(games);
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            const fireSpy = vi.spyOn(provider._onDidChangeTreeData, 'fire');
 
-            expect(html).toContain('NYY 10 - 5 BOS');
-            expect(html).toContain('Final');
-            expect(html).toContain('MLB Scores - Today');
+            await provider.refresh();
+
+            expect(mockApiService.getTodaysGames).toHaveBeenCalled();
+            expect(provider.games).toEqual(mockGames);
+            expect(fireSpy).toHaveBeenCalled();
         });
 
-        it('should handle games with no scores', () => {
-            const games = [
-                {
-                    teams: {
-                        away: { team: { name: 'New York Yankees' }, score: undefined },
-                        home: { team: { name: 'Boston Red Sox' }, score: undefined }
-                    },
-                    status: { detailedState: 'Scheduled' }
-                }
-            ];
+        it('should handle API errors gracefully', async () => {
+            const errorMessage = 'Network error';
+            mockApiService.getTodaysGames.mockRejectedValue(new Error(errorMessage));
+            const fireSpy = vi.spyOn(provider._onDidChangeTreeData, 'fire');
 
-            const html = provider.generateHtml(games);
+            await provider.refresh();
 
-            expect(html).toContain('NYY 0 - 0 BOS');
-            expect(html).toContain('Scheduled');
-        });
-
-        it('should show no games message when empty', () => {
-            const html = provider.generateHtml([]);
-
-            expect(html).toContain('No games scheduled for today');
-        });
-    });
-
-    describe('generateErrorHtml', () => {
-        it('should generate error HTML with message', () => {
-            const errorMessage = 'Network connection failed';
-            const html = provider.generateErrorHtml(errorMessage);
-
-            expect(html).toContain('Error loading MLB scores');
-            expect(html).toContain('Network connection failed');
-            expect(html).toContain('Try Again');
+            expect(provider.games).toEqual([]);
+            expect(fireSpy).toHaveBeenCalled();
         });
     });
 });

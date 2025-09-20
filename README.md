@@ -4,12 +4,13 @@ This Visual Studio Code extension allows you to view Major League Baseball (MLB)
 
 ## Features
 
+- **Sidebar Integration**: Displays scores directly in VS Code's Explorer sidebar
 - **Daily MLB Scores**: View all MLB games scheduled for today
 - **Live Data**: Fetches real-time data from the official MLB Stats API
 - **Clean Display**: Shows scores in an easy-to-read format (e.g., "NYY 10 - 5 BOS")
 - **Game Status**: Displays current status of each game (Final, In Progress, Scheduled, etc.)
-- **One-Click Refresh**: Reload button to get the latest scores
-- **VS Code Integration**: Seamlessly integrates with your VS Code theme and interface
+- **One-Click Refresh**: Refresh button in the tree view title to get the latest scores
+- **Native Integration**: Seamlessly integrates with VS Code's native tree view interface
 
 ## Installation
 
@@ -18,10 +19,10 @@ This Visual Studio Code extension allows you to view Major League Baseball (MLB)
 
 ## Usage
 
-1. Open the Command Palette (`Ctrl+Shift+P` on Windows/Linux, `Cmd+Shift+P` on macOS)
-2. Type "Show MLB Scores" and select the command
-3. A new panel will open displaying today's MLB games and scores
-4. Click the "Reload" button to refresh the data
+1. After installation, the "MLB Scores" section will appear in your Explorer sidebar
+2. Scores will load automatically when the extension activates
+3. Click the refresh button (🔄) in the tree view title to update scores
+4. Each game shows: "AWAY_TEAM AWAY_SCORE - HOME_SCORE HOME_TEAM" with status
 
 ## Score Format
 

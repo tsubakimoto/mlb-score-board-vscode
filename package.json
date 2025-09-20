@@ -4,6 +4,7 @@
   "description": "View MLB game results for today",
   "version": "1.0.0",
   "publisher": "tsubakimoto",
+  "type": "module",
   "engines": {
     "vscode": "^1.74.0"
   },

@@ -1,0 +1,37 @@
+{
+  "name": "mlb-score-board-vscode",
+  "displayName": "MLB Score Board",
+  "description": "View MLB game results for today",
+  "version": "1.0.0",
+  "publisher": "tsubakimoto",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:mlbScoreBoard.showScores"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mlbScoreBoard.showScores",
+        "title": "Show MLB Scores",
+        "category": "MLB"
+      }
+    ]
+  },
+  "scripts": {
+    "test": "vitest",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "vitest": "^1.0.0"
+  },
+  "license": "MIT",
+  "author": "Yuta Matsumura",
+  "keywords": ["mlb", "baseball", "scores", "sports"]
+}

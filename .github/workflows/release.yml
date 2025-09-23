@@ -70,8 +70,14 @@ jobs:
         
       - name: Update version in package.json
         run: |
-          npm version ${{ needs.validate.outputs.version }} --no-git-tag-version
-          
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          TARGET_VERSION="${{ needs.validate.outputs.version }}"
+          if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
+            npm version "$TARGET_VERSION" --no-git-tag-version
+          else
+            echo "Version is already $TARGET_VERSION, skipping npm version."
+          fi
+        
       - name: Package extension
         run: npm run package
         

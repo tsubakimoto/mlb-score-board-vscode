@@ -64,7 +64,8 @@ describe('MLBScoreBoardProvider', () => {
                         away: { team: { name: 'New York Yankees' }, score: 10 },
                         home: { team: { name: 'Boston Red Sox' }, score: 5 }
                     },
-                    status: { detailedState: 'Final' }
+                    status: { detailedState: 'Final' },
+                    venue: { name: 'Fenway Park' }
                 }
             ];
             provider.games = mockGames;
@@ -72,7 +73,7 @@ describe('MLBScoreBoardProvider', () => {
             const children = provider.getChildren();
 
             expect(children).toHaveLength(1);
-            expect(children[0].label).toBe('NYY 10 - 5 BOS');
+            expect(children[0].label).toBe('NYY 10 - 5 BOS @Fenway Park');
             expect(children[0].description).toBe('Final');
         });
 
@@ -88,7 +89,8 @@ describe('MLBScoreBoardProvider', () => {
                         away: { team: { name: 'New York Yankees' }, score: undefined },
                         home: { team: { name: 'Boston Red Sox' }, score: undefined }
                     },
-                    status: { detailedState: 'Scheduled' }
+                    status: { detailedState: 'Scheduled' },
+                    venue: { name: 'Fenway Park' }
                 }
             ];
             provider.games = mockGames;
@@ -96,8 +98,27 @@ describe('MLBScoreBoardProvider', () => {
             const children = provider.getChildren();
 
             expect(children).toHaveLength(1);
-            expect(children[0].label).toBe('NYY 0 - 0 BOS');
+            expect(children[0].label).toBe('NYY 0 - 0 BOS @Fenway Park');
             expect(children[0].description).toBe('Scheduled');
+        });
+
+        it('should handle games without venue information', () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: 3 },
+                        home: { team: { name: 'Boston Red Sox' }, score: 2 }
+                    },
+                    status: { detailedState: 'Final' }
+                }
+            ];
+            provider.games = mockGames;
+
+            const children = provider.getChildren();
+
+            expect(children).toHaveLength(1);
+            expect(children[0].label).toBe('NYY 3 - 2 BOS @');
+            expect(children[0].description).toBe('Final');
         });
     });
 
@@ -109,7 +130,8 @@ describe('MLBScoreBoardProvider', () => {
                         away: { team: { name: 'New York Yankees' }, score: 10 },
                         home: { team: { name: 'Boston Red Sox' }, score: 5 }
                     },
-                    status: { detailedState: 'Final' }
+                    status: { detailedState: 'Final' },
+                    venue: { name: 'Fenway Park' }
                 }
             ];
 

@@ -8,8 +8,9 @@ class GameItem extends vscode.TreeItem {
         const awayScore = game.teams.away.score || 0;
         const homeScore = game.teams.home.score || 0;
         const status = game.status.detailedState;
+        const venueName = game.venue?.name || '';
         
-        const label = `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam}`;
+        const label = `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam} @${venueName}`;
         
         super(label, vscode.TreeItemCollapsibleState.None);
         

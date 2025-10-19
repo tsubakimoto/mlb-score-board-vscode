@@ -56,6 +56,34 @@ describe('MLBApiService', () => {
             expect(result[0].teams.home.team.name).toBe('Boston Red Sox');
         });
 
+        it('should fetch games for a specific date when provided', async () => {
+            const mockResponse = {
+                dates: [{
+                    games: [
+                        {
+                            teams: {
+                                away: { team: { name: 'New York Yankees' }, score: 2 },
+                                home: { team: { name: 'Boston Red Sox' }, score: 1 }
+                            },
+                            status: { detailedState: 'Final' }
+                        }
+                    ]
+                }]
+            };
+
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockResponse
+            });
+
+            const result = await service.getTodaysGames('12/25/2024');
+
+            expect(result).toHaveLength(1);
+            expect(global.fetch).toHaveBeenCalledWith(
+                expect.stringContaining('date=12/25/2024')
+            );
+        });
+
         it('should return empty array when no games', async () => {
             const mockResponse = { dates: [] };
 

@@ -24,6 +24,11 @@ vi.mock('vscode', () => ({
     },
     window: {
         showErrorMessage: vi.fn()
+    },
+    workspace: {
+        getConfiguration: vi.fn(() => ({
+            get: vi.fn(() => '')
+        }))
     }
 }));
 
@@ -143,6 +148,58 @@ describe('MLBScoreBoardProvider', () => {
             expect(mockApiService.getTodaysGames).toHaveBeenCalled();
             expect(provider.games).toEqual(mockGames);
             expect(fireSpy).toHaveBeenCalled();
+        });
+
+        it('should pass custom date from configuration to API service', async () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: 3 },
+                        home: { team: { name: 'Boston Red Sox' }, score: 2 }
+                    },
+                    status: { detailedState: 'Final' },
+                    venue: { name: 'Fenway Park' }
+                }
+            ];
+
+            // Mock configuration to return a specific date
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '12/25/2024')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+
+            await provider.refresh();
+
+            expect(mockApiService.getTodaysGames).toHaveBeenCalledWith('12/25/2024');
+            expect(provider.games).toEqual(mockGames);
+        });
+
+        it('should pass undefined when no custom date is configured', async () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: 4 },
+                        home: { team: { name: 'Boston Red Sox' }, score: 1 }
+                    },
+                    status: { detailedState: 'Final' },
+                    venue: { name: 'Fenway Park' }
+                }
+            ];
+
+            // Mock configuration to return empty string
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+
+            await provider.refresh();
+
+            expect(mockApiService.getTodaysGames).toHaveBeenCalledWith(undefined);
+            expect(provider.games).toEqual(mockGames);
         });
 
         it('should handle API errors gracefully', async () => {

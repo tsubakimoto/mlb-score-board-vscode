@@ -6,6 +6,7 @@ This Visual Studio Code extension allows you to view Major League Baseball (MLB)
 
 - **Sidebar Integration**: Displays scores directly in VS Code's Explorer sidebar
 - **Daily MLB Scores**: View all MLB games scheduled for today
+- **Custom Date Selection**: Optionally specify a custom game date in settings
 - **Live Data**: Fetches real-time data from the official MLB Stats API
 - **Clean Display**: Shows scores in an easy-to-read format (e.g., "NYY 10 - 5 BOS")
 - **Game Status**: Displays current status of each game (Final, In Progress, Scheduled, etc.)
@@ -24,6 +25,17 @@ This Visual Studio Code extension allows you to view Major League Baseball (MLB)
 3. Click the refresh button (🔄) in the tree view title to update scores
 4. Each game shows: "AWAY_TEAM AWAY_SCORE - HOME_SCORE HOME_TEAM" with status
 
+### Viewing Games for a Specific Date
+
+You can configure the extension to show games for a specific date:
+
+1. Open VS Code Settings (File > Preferences > Settings)
+2. Search for "MLB Score Board"
+3. Set the "Game Date" field to a date in `MM/DD/YYYY` format (e.g., `12/25/2024`)
+4. Leave the field empty to show today's games (default behavior)
+
+The scores will automatically refresh when you change the date setting.
+
 ## Score Format
 
 Games are displayed in the following format:
@@ -41,8 +53,9 @@ SEA 4 - 0 HOU                                [In Progress]
 ## Technical Details
 
 - **Data Source**: MLB Stats API (https://statsapi.mlb.com)
-- **Timezone**: Uses Pacific Standard Time (PST) for date calculation
-- **Refresh**: Manual refresh available via the "Reload" button
+- **Timezone**: Uses Pacific Standard Time (PST) for date calculation when no custom date is specified
+- **Date Format**: MM/DD/YYYY for custom date configuration
+- **Refresh**: Manual refresh available via the "Reload" button, automatic refresh on configuration change
 - **Theme Support**: Automatically adapts to your VS Code color theme
 
 ## Development

@@ -3,9 +3,9 @@ export class MLBApiService {
         this.baseUrl = 'https://statsapi.mlb.com/api/v1';
     }
 
-    async getTodaysGames() {
-        const todayPST = this.getTodayInPST();
-        const url = `${this.baseUrl}/schedule/games/?sportId=1&date=${todayPST}`;
+    async getTodaysGames(date = undefined) {
+        const gameDate = date || this.getTodayInPST();
+        const url = `${this.baseUrl}/schedule/games/?sportId=1&date=${gameDate}`;
         
         try {
             const response = await fetch(url);

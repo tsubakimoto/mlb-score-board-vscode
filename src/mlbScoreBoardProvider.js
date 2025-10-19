@@ -42,7 +42,9 @@ export class MLBScoreBoardProvider {
 
     async refresh() {
         try {
-            this.games = await this.apiService.getTodaysGames();
+            const config = vscode.workspace.getConfiguration('mlbScoreBoard');
+            const gameDate = config.get('gameDate');
+            this.games = await this.apiService.getTodaysGames(gameDate || undefined);
             this._onDidChangeTreeData.fire();
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to load MLB scores: ${error.message}`);

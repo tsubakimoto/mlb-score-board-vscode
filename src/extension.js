@@ -15,7 +15,14 @@ export function activate(context) {
         provider.refresh();
     });
 
-    context.subscriptions.push(treeView, refreshCommand);
+    // Listen for configuration changes
+    const configChangeListener = vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('mlbScoreBoard.gameDate')) {
+            provider.refresh();
+        }
+    });
+
+    context.subscriptions.push(treeView, refreshCommand, configChangeListener);
     
     // Initial load of scores
     provider.refresh();

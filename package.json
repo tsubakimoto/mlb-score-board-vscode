@@ -2,7 +2,7 @@
   "name": "mlb-score-board-vscode",
   "displayName": "MLB Score Board",
   "description": "View MLB game results for today",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "tsubakimoto",
   "icon": "icon.png",
   "type": "module",

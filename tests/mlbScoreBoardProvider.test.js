@@ -24,6 +24,11 @@ vi.mock('vscode', () => ({
     },
     window: {
         showErrorMessage: vi.fn()
+    },
+    workspace: {
+        getConfiguration: vi.fn(() => ({
+            get: vi.fn(() => '')
+        }))
     }
 }));
 
@@ -145,6 +150,58 @@ describe('MLBScoreBoardProvider', () => {
             expect(fireSpy).toHaveBeenCalled();
         });
 
+        it('should pass custom date from configuration to API service', async () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: 3 },
+                        home: { team: { name: 'Boston Red Sox' }, score: 2 }
+                    },
+                    status: { detailedState: 'Final' },
+                    venue: { name: 'Fenway Park' }
+                }
+            ];
+
+            // Mock configuration to return a specific date
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '12/25/2024')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+
+            await provider.refresh();
+
+            expect(mockApiService.getTodaysGames).toHaveBeenCalledWith('12/25/2024');
+            expect(provider.games).toEqual(mockGames);
+        });
+
+        it('should pass undefined when no custom date is configured', async () => {
+            const mockGames = [
+                {
+                    teams: {
+                        away: { team: { name: 'New York Yankees' }, score: 4 },
+                        home: { team: { name: 'Boston Red Sox' }, score: 1 }
+                    },
+                    status: { detailedState: 'Final' },
+                    venue: { name: 'Fenway Park' }
+                }
+            ];
+
+            // Mock configuration to return empty string
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+
+            await provider.refresh();
+
+            expect(mockApiService.getTodaysGames).toHaveBeenCalledWith(undefined);
+            expect(provider.games).toEqual(mockGames);
+        });
+
         it('should handle API errors gracefully', async () => {
             const errorMessage = 'Network error';
             mockApiService.getTodaysGames.mockRejectedValue(new Error(errorMessage));
@@ -154,6 +211,58 @@ describe('MLBScoreBoardProvider', () => {
 
             expect(provider.games).toEqual([]);
             expect(fireSpy).toHaveBeenCalled();
+        });
+
+        it('should update tree view title when custom date is set', async () => {
+            const mockGames = [];
+            const mockTreeView = { title: 'MLB Scores' };
+            
+            // Mock configuration to return a specific date
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '12/25/2024')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            provider.setTreeView(mockTreeView);
+
+            await provider.refresh();
+
+            expect(mockTreeView.title).toBe('MLB Scores - 12/25/2024');
+        });
+
+        it('should reset tree view title when no custom date is set', async () => {
+            const mockGames = [];
+            const mockTreeView = { title: 'MLB Scores - 12/25/2024' };
+            
+            // Mock configuration to return empty string
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            provider.setTreeView(mockTreeView);
+
+            await provider.refresh();
+
+            expect(mockTreeView.title).toBe('MLB Scores');
+        });
+
+        it('should handle refresh without tree view set', async () => {
+            const mockGames = [];
+            
+            // Mock configuration
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '12/25/2024')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            provider.treeView = null;
+
+            // Should not throw error
+            await expect(provider.refresh()).resolves.not.toThrow();
         });
     });
 });

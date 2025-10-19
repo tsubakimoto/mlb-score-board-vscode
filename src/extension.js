@@ -10,12 +10,22 @@ export function activate(context) {
         showCollapseAll: false
     });
     
+    // Pass the tree view to the provider so it can update the title
+    provider.setTreeView(treeView);
+    
     // Register the refresh command
     const refreshCommand = vscode.commands.registerCommand('mlbScoreBoard.refresh', () => {
         provider.refresh();
     });
 
-    context.subscriptions.push(treeView, refreshCommand);
+    // Listen for configuration changes
+    const configChangeListener = vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('mlbScoreBoard.gameDate')) {
+            provider.refresh();
+        }
+    });
+
+    context.subscriptions.push(treeView, refreshCommand, configChangeListener);
     
     // Initial load of scores
     provider.refresh();

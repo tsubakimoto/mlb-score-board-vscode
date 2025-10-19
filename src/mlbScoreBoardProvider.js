@@ -24,8 +24,13 @@ export class MLBScoreBoardProvider {
     constructor() {
         this.apiService = new MLBApiService();
         this.games = [];
+        this.treeView = null;
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+    }
+
+    setTreeView(treeView) {
+        this.treeView = treeView;
     }
 
     getTreeItem(element) {
@@ -42,7 +47,19 @@ export class MLBScoreBoardProvider {
 
     async refresh() {
         try {
-            this.games = await this.apiService.getTodaysGames();
+            const config = vscode.workspace.getConfiguration('mlbScoreBoard');
+            const gameDate = config.get('gameDate') || undefined;
+            this.games = await this.apiService.getTodaysGames(gameDate);
+            
+            // Update tree view title with date if custom date is set
+            if (this.treeView) {
+                if (gameDate) {
+                    this.treeView.title = `MLB Scores - ${gameDate}`;
+                } else {
+                    this.treeView.title = 'MLB Scores';
+                }
+            }
+            
             this._onDidChangeTreeData.fire();
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to load MLB scores: ${error.message}`);

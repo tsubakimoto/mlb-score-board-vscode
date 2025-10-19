@@ -10,6 +10,9 @@ export function activate(context) {
         showCollapseAll: false
     });
     
+    // Pass the tree view to the provider so it can update the title
+    provider.setTreeView(treeView);
+    
     // Register the refresh command
     const refreshCommand = vscode.commands.registerCommand('mlbScoreBoard.refresh', () => {
         provider.refresh();

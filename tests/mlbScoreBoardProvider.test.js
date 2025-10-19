@@ -212,5 +212,57 @@ describe('MLBScoreBoardProvider', () => {
             expect(provider.games).toEqual([]);
             expect(fireSpy).toHaveBeenCalled();
         });
+
+        it('should update tree view title when custom date is set', async () => {
+            const mockGames = [];
+            const mockTreeView = { title: 'MLB Scores' };
+            
+            // Mock configuration to return a specific date
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '12/25/2024')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            provider.setTreeView(mockTreeView);
+
+            await provider.refresh();
+
+            expect(mockTreeView.title).toBe('MLB Scores - 12/25/2024');
+        });
+
+        it('should reset tree view title when no custom date is set', async () => {
+            const mockGames = [];
+            const mockTreeView = { title: 'MLB Scores - 12/25/2024' };
+            
+            // Mock configuration to return empty string
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            provider.setTreeView(mockTreeView);
+
+            await provider.refresh();
+
+            expect(mockTreeView.title).toBe('MLB Scores');
+        });
+
+        it('should handle refresh without tree view set', async () => {
+            const mockGames = [];
+            
+            // Mock configuration
+            const vscode = await import('vscode');
+            vscode.workspace.getConfiguration = vi.fn(() => ({
+                get: vi.fn(() => '12/25/2024')
+            }));
+
+            mockApiService.getTodaysGames.mockResolvedValue(mockGames);
+            provider.treeView = null;
+
+            // Should not throw error
+            await expect(provider.refresh()).resolves.not.toThrow();
+        });
     });
 });

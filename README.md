@@ -34,7 +34,7 @@ You can configure the extension to show games for a specific date:
 3. Set the "Game Date" field to a date in `MM/DD/YYYY` format (e.g., `12/25/2024`)
 4. Leave the field empty to show today's games (default behavior)
 
-The scores will automatically refresh when you change the date setting.
+The scores will automatically refresh when you change the date setting. When a custom date is configured, the date will be displayed in the view title (e.g., "MLB Scores - 12/25/2024").
 
 ## Score Format
 

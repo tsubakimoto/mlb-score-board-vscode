@@ -10,11 +10,11 @@ class GameItem extends vscode.TreeItem {
         const status = game.status.detailedState;
         const venueName = game.venue?.name || '';
         
-        const label = `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam} @${venueName}`;
+        const label = `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam}`;
         
         super(label, vscode.TreeItemCollapsibleState.None);
         
-        this.description = status;
+        this.description = venueName ? `${status} @${venueName}` : status;
         this.contextValue = 'game';
         this.tooltip = `${game.teams.away.team.name} vs ${game.teams.home.team.name} - ${status}`;
     }

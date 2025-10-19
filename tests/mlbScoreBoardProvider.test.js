@@ -73,8 +73,8 @@ describe('MLBScoreBoardProvider', () => {
             const children = provider.getChildren();
 
             expect(children).toHaveLength(1);
-            expect(children[0].label).toBe('NYY 10 - 5 BOS @Fenway Park');
-            expect(children[0].description).toBe('Final');
+            expect(children[0].label).toBe('NYY 10 - 5 BOS');
+            expect(children[0].description).toBe('Final @Fenway Park');
         });
 
         it('should return empty array for non-root elements', () => {
@@ -98,8 +98,8 @@ describe('MLBScoreBoardProvider', () => {
             const children = provider.getChildren();
 
             expect(children).toHaveLength(1);
-            expect(children[0].label).toBe('NYY 0 - 0 BOS @Fenway Park');
-            expect(children[0].description).toBe('Scheduled');
+            expect(children[0].label).toBe('NYY 0 - 0 BOS');
+            expect(children[0].description).toBe('Scheduled @Fenway Park');
         });
 
         it('should handle games without venue information', () => {
@@ -117,7 +117,7 @@ describe('MLBScoreBoardProvider', () => {
             const children = provider.getChildren();
 
             expect(children).toHaveLength(1);
-            expect(children[0].label).toBe('NYY 3 - 2 BOS @');
+            expect(children[0].label).toBe('NYY 3 - 2 BOS');
             expect(children[0].description).toBe('Final');
         });
     });

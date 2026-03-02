@@ -82,7 +82,7 @@ jobs:
         run: npm run package
         
       - name: Upload release artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: mlb-score-board-vscode-${{ needs.validate.outputs.version }}
           path: '*.vsix'
@@ -103,7 +103,7 @@ jobs:
           echo "\`code --install-extension mlb-score-board-vscode-${{ needs.validate.outputs.version }}.vsix\`" >> release-notes.md
           
       - name: Upload release notes
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: release-notes
           path: release-notes.md
